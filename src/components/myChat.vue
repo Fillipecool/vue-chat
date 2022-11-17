@@ -1,44 +1,51 @@
 <template>
-  <div>
-    <p class="p-8 m-5 "> {{ msg }}</p>
-  </div>
-    <input type="text" v-model="input_msg" placeholder="Coloque um texto" class="p-8 m-5 border-2 border-neutral-800">
-    <input type="submit" name="Enviar" v-on:click="send" class="p-8 m-5 border-4 hover:border-black">
-    <picComponent class="w-10"/>
-  <div>
-    <button class="border-2 bg-blue-100 m-2 p-3 w-40 hover:bg-blue-300 rounded-xl" @click="Informacao">{{ saber }}</button>
-    <p class="rounded-2xl m-3 w-60 bg-green-300 p-2" v-show="Info">Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime quasi odit, reiciendis debitis, rem corrupti consectetur aperiam unde incidunt reprehenderit suscipit nam ducimus deleniti quam. Quos vel modi praesentium ea! </p>
-  </div>
+    <div contenteditable="true" class="w-96 m-12 h-80  border-neutral-800">
+      <textarea @keydown.enter="getSentimental(), getWord()" type="text" v-model="msg" placeholder="Coloque um texto" class="w-96 h-60 border-2"/>
+    </div>
 </template>
 
 <script>
-  import picComponent from './picComponent.vue'
-  export default {
+
+import axios from "axios"
+
+export default {
   name: 'myChat',
-  components: {
-    picComponent
-    },
     data() {
       return {
         msg: "",
-        input_msg: "",
-        Info: false,
-        saber: "Mostrar Informação"
       }
     },
   methods: {
-    Informacao() {
-      if(!this.Info){
-        this.saber = "Ocultar Informação"
-      }else{
-        this.saber = "Mostrar Informação"
+    getSentimental(){
+      try{
+        axios.get("https://test-nlp-api.alertrack.com.br/v1/polarity/unique/?sentence="+this.msg).then((response) => {
+        console.log(response.data.describe)
+      })
+      }catch(error){
+        console.log(error)
       }
-      this.Info = !this.Info
     },
-    send() {
-      console.log("chego aqui")  
-      this.msg = this.input_msg
+    getWord(){
+      const palavras = this.msg.split(' ') 
+      try{
+        for (let index = 0; index < palavras.length; index++){
+          axios.get('https://test-languagetools.alertrack.com.br/v2/check?language=pt-BR&text='+palavras[index])
+          .then((response) =>{
+              response.data.matches.length != 0 ? this.getCorrect(response.data.matches[0]) : ''
+          })
+        }
+      }catch(error){
+        console.log(error)
+      }
+    },
+    getCorrect(param){
+      console.log(param)
+          // vue.http.interceptor.push({
+          //   request: function (request)
+          // })
+      // vou precisar do shortMessage,sentence, message e [replacements]
+      
     }
-  }
+  },
 }
 </script>

@@ -20,5 +20,15 @@ npm run build
 npm run lint
 ```
 
+### Install vue/cli
+```
+npm install -g @vue/cli
+```
+
+### Get Axios
+```
+npm install axios
+
+
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
