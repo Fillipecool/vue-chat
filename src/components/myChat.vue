@@ -1,12 +1,17 @@
 <template>
-    <textarea @keydown.enter="getSentimental(), getWord()" type="text"  v-model="msg" placeholder="Coloque um texto" class=" z-40 w-96 h-40 border-2"/> 
-
+    <div class="w-4/5 h-48  absolute bottom-10 left-10">
+      <input @keydown.enter="getSentimental(), getWord()" v-model="msg" class="absolute placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md z-40 w-4/5 h-48 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm text-start" placeholder="Escreva alguma coisa" type="text" name="textchat"/>
+    </div>
     <div v-for="info in info" :key="info" class="w-60 bg-red-500 bg border-neutral-800"> 
-      <button id="corretor" type="button" @click="getCorrect(suggestions)" v-if="info != null">{{ info }}</button>
-      <span class="border-2"> {{ suggestions }} </span>
+      <button id="corretor" type="button" @click="getCorrect()" v-if="info != null"> 
+        {{ info }}
+      </button> 
     </div> 
-    
-    <!-- <button v-show="" type="button"> {{ suggestions }} </button> -->
+    <div v-for="suggestion in suggestions" :key="suggestion">
+      <button id="replace" type="button" v-if="suggestions != 0" class="border-2 no-underline hover:underline"> 
+        {{ suggestions }}
+      </button>
+    </div>
 </template>
 
 
@@ -15,6 +20,9 @@ import axios from "axios"
 
 export default {
   name: 'myChat',
+    setup(){
+
+    },
     data() {
       return {
         msg: "",
@@ -61,7 +69,7 @@ export default {
           .then((response) => {
             // console.log('aqui', response.data.matches[0])
               this.suggestions = response.data.matches[0].replacements
-              console.log(this.suggestions)
+              console.log("sugestão", this.suggestions)
           })
           .catch(error => console.log(error))
         }
