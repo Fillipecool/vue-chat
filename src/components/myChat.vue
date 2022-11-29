@@ -3,7 +3,7 @@
       <textarea v-model="msg" rows="10" cols="125" @keydown.enter="getSentimental(), getWord()" class="resize-none absolute placeholder:italic placeholder:text-slate-400 block bg-white border border-slate-300 rounded-md z-40 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm text-start" placeholder="Escreva alguma coisa" type="text" name="textchat"/>
     </div>
     <div class="bg-red-500 bg border-neutral-800"> 
-      <button id="renderResults" type="button" @click="getCorrect()" v-if="info != 0"
+      <button id="renderResults" type="button" @click="getCorrect(), getOffset()" v-if="info != 0"
       > 
         {{ info }}
       </button> 
@@ -34,9 +34,26 @@ export default {
         info: [],
         suggestions:[],
         wrong:[]
+        
         }
       },
   methods: {
+    funcao(){
+      let stringExample = this.msg;
+      let result = stringExample.substring(0, 4);
+      console.log("funcao",result)
+    },
+
+    getOffset(){
+      axios.get('https://test-languagetools.alertrack.com.br/v2/check?language=pt-BR&text='+this.msg)
+      .then((response) =>{
+        this.offset = response.data.matches.forEach(offset => {
+          console.log("offset", offset)
+        })
+      })
+      .catch(error => console.log(error))
+    },  
+
     getIssueType(){
       // < 1° erro :  typographical (verificar letra maiuscula) / id = CASING
       // < 2° erro :  misspelling   (Erro ortográfico) / id = HUNSPELL_RULE
@@ -46,13 +63,9 @@ export default {
           axios.get('https://test-languagetools.alertrack.com.br/v2/check?language=pt-BR&text='+this.msg)
           .then((response) => {
             this.info = response.data.matches
-            this.wrong = this.info[0]
-            this.wrong1 = this.info[1]
-            this.wrong2 = this.info[2]
-            this.wrong3 = this.info[3]
-            console.log("info",this.info)
-            console.log("wrong",this.wrong)
-            console.log("wrong2",this.wrong1)
+            this.info.forEach(wrong => {
+              console.log("foreach palavra errada",wrong)
+            })
           })
           .catch(error => console.log(error))
         },
@@ -63,7 +76,7 @@ export default {
     getSentimental(){
       axios.get("https://test-nlp-api.alertrack.com.br/v1/polarity/unique/?sentence="+this.msg)
       .then((response) => {
-        console.log(response.data.describe)
+        console.log("Sentimento : ",response.data.describe)
       })
       .catch(error => console.log(error))
     },
@@ -79,7 +92,7 @@ export default {
           // console.log('aqui', response.data.matches[0].sentence)
           if(response.data.matches.length !== 0 && response.data.matches[0].sentence !== null){
             this.info = response.data.matches[0].sentence
-            console.log(response.data.matches[0])
+            console.log("getWord",response.data.matches[0].offset)
         }
       })
       .catch(error => console.log(error))
